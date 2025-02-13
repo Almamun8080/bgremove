@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BgRemover with License, Visitor Counter, & Admin Blocking</title>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      color: #333;
+    }
+    header {
+      background: rgba(255,255,255,0.9);
+      padding: 1rem 2rem;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #5563DE;
+      text-align: center;
+    }
+    nav {
+      margin-top: 0.5rem;
+    }
+    nav a {
+      margin: 0 1rem;
+      color: #5563DE;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+    nav a:hover {
+      color: #74ABE2;
+    }
+    /* Animated Notice Banner (One Line, Professional Animation) */
+    #notice {
+      background: #fff3cd;
+      color: red;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ffeeba;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+      /* Slide in from above & then a subtle glow */
+      animation: slideInFade 1.2s ease-out forwards, subtleGlow 3s infinite 1.5s;
+    }
+    @keyframes slideInFade {
+      0% {
+        transform: translateY(-50%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    @keyframes subtleGlow {
+      0% { text-shadow: none; }
+      50% { text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+      100% { text-shadow: none; }
+    }
+    /* Visitor Counter (Demo Only) */
+    #visitor-counters {
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #5563DE;
+    }
+    /* Container */
+    .container {
+      background: #fff;
+      max-width: 600px;
+      margin: 180px auto 2rem; /* account for fixed header & notice */
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #5563DE;
+    }
+    input[type="text"],
+    input[type="password"],
+    select {
+      padding: 0.5rem;
+      width: 80%;
+      max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin: 0.5rem 0;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      background: #5563DE;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      margin: 0.5rem;
+    }
+    button:hover {
+      background: #74ABE2;
+      transform: scale(1.05);
+    }
+    .error {
+      color: #dc3545;
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 0.5rem;
+      text-align: left;
+    }
+    /* Background Removal Tool Styles */
+    .api-key-section {
+      background: #f1f1f1;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .api-key-section label {
+      font-weight: bold;
+      color: #333;
+    }
+    .api-key-section input {
+      padding: 0.5rem;
+      width: 60%;
+      max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 0.5rem;
+    }
+    .api-key-section button {
+      padding: 0.5rem 1rem;
+      background: #5563DE;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .api-key-section button:hover {
+      background: #74ABE2;
+    }
+    .drag-drop-area {
+      border: 3px dashed #5563DE;
+      border-radius: 10px;
+      padding: 2rem;
+      margin: 2rem auto;
+      text-align: center;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+    .drag-drop-area.hover {
+      background-color: rgba(85,99,222,0.1);
+    }
+    .drag-drop-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .drag-icon {
+      width: 60px;
+      height: 60px;
+      fill: #5563DE;
+      margin-bottom: 1rem;
+    }
+    .upload-section {
+      margin-bottom: 2rem;
+    }
+    .upload-label {
+      background: #5563DE;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      border: none;
+      transition: transform 0.3s ease;
+    }
+    .upload-label:hover {
+      transform: scale(1.05);
+    }
+    #file-input {
+      display: none;
+    }
+    .drag-drop-text {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .preview-section {
+      margin-top: 2rem;
+    }
+    .image-card {
+      background: #f9f9f9;
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: inline-block;
+      width: 200px;
+    }
+    .image-card p {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .preview-image {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+    }
+    .download-btn,
+    .download-all-btn,
+    .thank-you-btn {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      font-size: 1rem;
+      margin: 0.5rem;
+    }
+    .download-btn:hover,
+    .download-all-btn:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+    .thank-you-btn {
+      background: #ffc107;
+    }
+    .thank-you-btn:hover {
+      background: #e0a800;
+      transform: scale(1.05);
+    }
+    .download-all-btn {
+      margin-top: 1rem;
+    }
+    .loading {
+      color: #5563DE;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Navigation -->
+  <header>
+    <h1>BgRemover</h1>
+    <nav>
+      <a id="nav-user">User</a>
+      <a id="nav-admin">Admin</a>
+      <a href="https://www.remove.bg/es/api" target="_blank">API link</a>
+    </nav>
+    <!-- Animated Notice Banner (One Line) -->
+    <div id="notice">
+      ফিডব্যাক জানাইতে বলেছিলাম আপনাদের সকলকে যেহেতু কেউ ফিডব্যাক দেয়নি তার মানে কেউ ব্যবহার করেনি। ফ্রি জিনিসের ভ্যালু নাই। এখন থেকে ব্যবহার করতে হলে মাসিক ১০০ টাকা সাবস্কিপশন ফি দিয়ে ব্যবহার করবেন।
+    </div>
+    <!-- Visitor Counters (Demo Only) -->
+    <div id="visitor-counters">
+      Total Visitors: <span id="total-visitors">0</span> | Today's Visitors: <span id="today-visitors">0</span>
+    </div>
+  </header>
+
+  <!-- User License Validation Section -->
+  <div class="container" id="license-validation-section">
+    <h2>Enter License Key</h2>
+    <input type="text" id="license-input" placeholder="Enter your license key" />
+    <button id="validate-license-btn">Validate License</button>
+    <div id="license-validation-error" class="error"></div>
+  </div>
+
+  <!-- User Tool Section (Background Removal Tool) -->
+  <div id="user-tool-section" style="display:none;">
+    <div class="container" id="home">
+      <h2>Remove Background from Images</h2>
+      <!-- License Validity Message -->
+      <p id="license-validity" style="font-weight:bold;"></p>
+      <!-- API Key Input Section -->
+      <div class="api-key-section">
+        <label for="api-key-input">Your Remove.bg API Key:</label>
+        <input type="text" id="api-key-input" placeholder="Enter your API key" />
+        <button id="save-api-key">Save API Key</button>
+      </div>
+      <!-- Big Drag & Drop Area -->
+      <div class="drag-drop-area" id="drag-drop-area">
+        <div class="drag-drop-content">
+          <svg xmlns="http://www.w3.org/2000/svg" class="drag-icon" viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18h14v2H5z"/>
+          </svg>
+          <p>Drag and drop your images here</p>
+        </div>
+      </div>
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <label for="file-input" class="upload-label">Upload Images</label>
+        <input type="file" id="file-input" accept="image/*" multiple />
+        <div class="drag-drop-text">or drag and drop images</div>
+      </div>
+      <!-- Preview Section for Processed Images -->
+      <div class="preview-section" id="preview-container"></div>
+      <button id="download-all-btn" class="download-all-btn" style="display:none;">Download All</button>
+      <button id="thank-you-btn" class="thank-you-btn">Thank You</button>
+      <div class="error" id="error"></div>
+    </div>
+  </div>
+
+  <!-- Admin Section -->
+  <div class="container" id="admin-section" style="display:none;">
+    <!-- Admin Login Form -->
+    <div id="admin-login-form">
+      <h2>Admin Login</h2>
+      <input type="text" id="admin-username" placeholder="Username" />
+      <input type="password" id="admin-password" placeholder="Password" />
+      <button id="admin-login-btn">Login</button>
+      <div id="admin-login-error" class="error"></div>
+    </div>
+    <!-- Admin Panel (License Generation & Visitor Log) -->
+    <div id="admin-panel" style="display:none;">
+      <h2>License Generation System</h2>
+      <select id="license-type-select">
+        <option value="monthly">One Month License</option>
+        <option value="trial">Trial License (24 Hours)</option>
+      </select>
+      <button id="generate-license-btn">Generate License</button>
+      <h3>Generated Licenses</h3>
+      <table id="license-table">
+        <thead>
+          <tr>
+            <th>License Key</th>
+            <th>Type</th>
+            <th>Expiry</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <hr>
+      <h3>Visitor Log</h3>
+      <table id="visitor-log-table">
+        <thead>
+          <tr>
+            <th>IP Address</th>
+            <th>Timestamp</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3>Blocked IPs</h3>
+      <table id="blocked-ip-table">
+        <thead>
+          <tr>
+            <th>IP Address</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="admin-logout-btn">Logout</button>
+      <p style="font-size:0.8rem; color:#888;">Note: MAC address information is not available via browsers.</p>
+    </div>
+  </div>
+
+  <!-- Script for Fetching & Logging User IP, Blocking -->
+  <script>
+    let currentIP = "";
+    // Fetch user IP using ipify API and log it (simulate visitor log)
+    function fetchUserIP() {
+      return fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          currentIP = data.ip;
+          // Log visitor in visitorLog (if not already logged)
+          let visitorLog = JSON.parse(localStorage.getItem('visitorLog')) || [];
+          if (!visitorLog.find(v => v.ip === currentIP)) {
+            visitorLog.push({ ip: currentIP, timestamp: new Date().toLocaleString() });
+            localStorage.setItem('visitorLog', JSON.stringify(visitorLog));
+          }
+          return currentIP;
+        })
+        .catch(err => console.error(err));
+    }
+    // Blocked list functions
+    function getBlockedList() {
+      return JSON.parse(localStorage.getItem('blockedList')) || [];
+    }
+    function isBlocked(ip) {
+      return getBlockedList().includes(ip);
+    }
+    function blockIP(ip) {
+      let blockedList = getBlockedList();
+      if (!blockedList.includes(ip)) {
+        blockedList.push(ip);
+        localStorage.setItem('blockedList', JSON.stringify(blockedList));
+        alert('Blocked IP: ' + ip);
+        loadBlockedIPTable();
+      }
+    }
+    function unblockIP(ip) {
+      let blockedList = getBlockedList();
+      blockedList = blockedList.filter(b => b !== ip);
+      localStorage.setItem('blockedList', JSON.stringify(blockedList));
+      alert('Unblocked IP: ' + ip);
+      loadBlockedIPTable();
+    }
+    // On page load, fetch IP and check if blocked
+    window.addEventListener('load', () => {
+      fetchUserIP().then(ip => {
+        if (isBlocked(ip)) {
+          document.body.innerHTML = '<h1 style="text-align:center; margin-top:100px;">Access Denied: You have been blocked.</h1>';
+        }
+      });
+    });
+  </script>
+
+  <!-- Admin Panel: Load Visitor Log & Blocked IPs -->
+  <script>
+    function loadVisitorLog() {
+      const visitorLog = JSON.parse(localStorage.getItem('visitorLog')) || [];
+      const tbody = document.querySelector("#visitor-log-table tbody");
+      tbody.innerHTML = "";
+      visitorLog.forEach(entry => {
+        const tr = document.createElement('tr');
+        const tdIP = document.createElement('td');
+        tdIP.textContent = entry.ip;
+        const tdTime = document.createElement('td');
+        tdTime.textContent = entry.timestamp;
+        const tdAction = document.createElement('td');
+        // If not already blocked, show a "Block" button
+        if (!isBlocked(entry.ip)) {
+          const blockBtn = document.createElement('button');
+          blockBtn.textContent = "Block";
+          blockBtn.onclick = () => blockIP(entry.ip);
+          tdAction.appendChild(blockBtn);
+        } else {
+          tdAction.textContent = "Blocked";
+        }
+        tr.appendChild(tdIP);
+        tr.appendChild(tdTime);
+        tr.appendChild(tdAction);
+        tbody.appendChild(tr);
+      });
+    }
+    function loadBlockedIPTable() {
+      const blockedList = getBlockedList();
+      const tbody = document.querySelector("#blocked-ip-table tbody");
+      tbody.innerHTML = "";
+      blockedList.forEach(ip => {
+        const tr = document.createElement('tr');
+        const tdIP = document.createElement('td');
+        tdIP.textContent = ip;
+        const tdAction = document.createElement('td');
+        const unblockBtn = document.createElement('button');
+        unblockBtn.textContent = "Unblock";
+        unblockBtn.onclick = () => unblockIP(ip);
+        tdAction.appendChild(unblockBtn);
+        tr.appendChild(tdIP);
+        tr.appendChild(tdAction);
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+
+  <!-- Background Removal Tool, License & Admin System Scripts -->
+  <script>
+    /* --- API Key Input and Save Functionality --- */
+    const apiKeyInput = document.getElementById('api-key-input');
+    const saveApiKeyBtn = document.getElementById('save-api-key');
+    const savedApiKey = localStorage.getItem('removeBgApiKey');
+    if (savedApiKey) {
+      apiKeyInput.value = savedApiKey;
+    }
+    saveApiKeyBtn.addEventListener('click', () => {
+      const apiKey = apiKeyInput.value.trim();
+      if (apiKey) {
+        localStorage.setItem('removeBgApiKey', apiKey);
+        alert('API key saved successfully!');
+      } else {
+        alert('Please enter a valid API key.');
+      }
+    });
+
+    /* --- Drag & Drop Functionality --- */
+    const dragDropArea = document.getElementById('drag-drop-area');
+    dragDropArea.addEventListener('dragover', e => { e.preventDefault(); dragDropArea.classList.add('hover'); });
+    dragDropArea.addEventListener('dragleave', e => { e.preventDefault(); dragDropArea.classList.remove('hover'); });
+    dragDropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      dragDropArea.classList.remove('hover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) handleFiles(files);
+    });
+
+    /* --- Image Upload and Processing Functionality --- */
+    const fileInput = document.getElementById('file-input');
+    const previewContainer = document.getElementById('preview-container');
+    const downloadAllBtn = document.getElementById('download-all-btn');
+    const errorDiv = document.getElementById('error');
+    const processedImages = [];
+    fileInput.addEventListener('change', event => {
+      const files = event.target.files;
+      if (files.length > 0) handleFiles(files);
+    });
+    async function handleFiles(files) {
+      let fileArray = Array.from(files);
+      if (fileArray.length > 50) {
+        alert("You can upload a maximum of 50 images at a time. Only the first 50 images will be processed.");
+        fileArray = fileArray.slice(0, 50);
+      }
+      previewContainer.innerHTML = '';
+      processedImages.length = 0;
+      errorDiv.textContent = '';
+      downloadAllBtn.style.display = 'none';
+      for (const file of fileArray) {
+        await processFile(file);
+      }
+      if (processedImages.length > 1) downloadAllBtn.style.display = 'block';
+    }
+    async function processFile(file) {
+      const card = document.createElement('div');
+      card.className = 'image-card';
+      const title = document.createElement('p');
+      title.textContent = file.name;
+      card.appendChild(title);
+      const loadingElem = document.createElement('div');
+      loadingElem.textContent = 'Processing...';
+      loadingElem.className = 'loading';
+      card.appendChild(loadingElem);
+      previewContainer.appendChild(card);
+      try {
+        const base64 = await toBase64(file);
+        const resultUrl = await removeBackground(base64);
+        card.removeChild(loadingElem);
+        const imgElem = document.createElement('img');
+        imgElem.src = resultUrl;
+        imgElem.className = 'preview-image';
+        card.appendChild(imgElem);
+        const btn = document.createElement('button');
+        btn.textContent = 'Download';
+        btn.className = 'download-btn';
+        btn.onclick = () => downloadImage(resultUrl, file.name);
+        card.appendChild(btn);
+        processedImages.push({ name: file.name, url: resultUrl });
+      } catch (err) {
+        card.removeChild(loadingElem);
+        const errorElem = document.createElement('p');
+        errorElem.textContent = 'Error processing image.';
+        errorElem.className = 'error';
+        card.appendChild(errorElem);
+        console.error(err);
+      }
+    }
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+    async function removeBackground(imageBase64) {
+      const storedApiKey = localStorage.getItem('removeBgApiKey');
+      if (!storedApiKey) throw new Error('No API key provided. Please enter your API key.');
+      const url = 'https://api.remove.bg/v1.0/removebg';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Api-Key': storedApiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ image_file_b64: imageBase64, size: 'auto' })
+      });
+      if (!response.ok) throw new Error('Failed to remove background');
+      const data = await response.blob();
+      return URL.createObjectURL(data);
+    }
+    function downloadImage(imageUrl, fileName) {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = fileName.replace(/\.[^/.]+$/, "") + '-bgremoved.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    function downloadAll() {
+      processedImages.forEach(image => downloadImage(image.url, image.name));
+    }
+    downloadAllBtn.addEventListener('click', downloadAll);
+    const thankYouBtn = document.getElementById('thank-you-btn');
+    thankYouBtn.addEventListener('click', () => {
+      window.open('https://www.facebook.com/bashir.ahammed.65163', '_blank');
+    });
+
+    /* --------- License & Admin System --------- */
+    function getLicenses() {
+      const data = localStorage.getItem('licenses');
+      return data ? JSON.parse(data) : [];
+    }
+    function saveLicenses(licenses) {
+      localStorage.setItem('licenses', JSON.stringify(licenses));
+    }
+    function generateLicenseKey() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let key = "";
+      for (let i = 0; i < 16; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return key;
+    }
+    function loadLicenseTable() {
+      const licenses = getLicenses();
+      const tbody = document.querySelector("#license-table tbody");
+      tbody.innerHTML = "";
+      licenses.forEach(lic => {
+        const row = document.createElement('tr');
+        const cellKey = document.createElement('td');
+        cellKey.textContent = lic.key;
+        const cellType = document.createElement('td');
+        cellType.textContent = lic.type;
+        const cellExpiry = document.createElement('td');
+        cellExpiry.textContent = new Date(lic.expiry).toLocaleString();
+        row.appendChild(cellKey);
+        row.appendChild(cellType);
+        row.appendChild(cellExpiry);
+        tbody.appendChild(row);
+      });
+    }
+    document.getElementById('admin-login-btn').addEventListener('click', () => {
+      const username = document.getElementById('admin-username').value.trim();
+      const password = document.getElementById('admin-password').value.trim();
+      // Admin credentials: username "admin" and password "Almamun4987"
+      if (username === "admin" && password === "Almamun4987") {
+        document.getElementById('admin-login-form').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        loadLicenseTable();
+        loadVisitorLog();
+        loadBlockedIPTable();
+      } else {
+        document.getElementById('admin-login-error').textContent = "Invalid credentials.";
+      }
+    });
+    document.getElementById('generate-license-btn').addEventListener('click', () => {
+      const licenseType = document.getElementById('license-type-select').value;
+      const duration = licenseType === "monthly" ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+      const expiryTimestamp = Date.now() + duration;
+      const licenseKey = generateLicenseKey();
+      const licenseObj = { key: licenseKey, type: licenseType, expiry: expiryTimestamp };
+      const licenses = getLicenses();
+      licenses.push(licenseObj);
+      saveLicenses(licenses);
+      loadLicenseTable();
+    });
+    document.getElementById('admin-logout-btn').addEventListener('click', () => {
+      document.getElementById('admin-username').value = "";
+      document.getElementById('admin-password').value = "";
+      document.getElementById('admin-login-error').textContent = "";
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('admin-login-form').style.display = 'block';
+    });
+    function showUserTool(foundLicense) {
+      const validityElem = document.getElementById('license-validity');
+      if (validityElem) {
+        validityElem.textContent = "Your license is valid until: " + new Date(foundLicense.expiry).toLocaleString();
+      }
+      document.getElementById('license-validation-section').style.display = "none";
+      document.getElementById('user-tool-section').style.display = "block";
+    }
+    document.getElementById('validate-license-btn').addEventListener('click', () => {
+      const inputLicense = document.getElementById('license-input').value.trim();
+      const licenses = getLicenses();
+      const found = licenses.find(lic => lic.key === inputLicense);
+      if (!found) {
+        document.getElementById('license-validation-error').textContent = "Invalid license key.";
+        return;
+      }
+      if (Date.now() > found.expiry) {
+        document.getElementById('license-validation-error').textContent = "License key has expired.";
+        return;
+      }
+      localStorage.setItem('validatedLicense', inputLicense);
+      document.getElementById('license-validation-error').textContent = "";
+      showUserTool(found);
+    });
+    window.addEventListener('load', () => {
+      const validatedLicense = localStorage.getItem('validatedLicense');
+      if (validatedLicense) {
+        const licenses = getLicenses();
+        const found = licenses.find(lic => lic.key === validatedLicense);
+        if (found && Date.now() <= found.expiry) {
+          showUserTool(found);
+        } else {
+          localStorage.removeItem('validatedLicense');
+          document.getElementById('license-validation-section').style.display = "block";
+          document.getElementById('user-tool-section').style.display = "none";
+        }
+      }
+    });
+    document.getElementById('nav-user').addEventListener('click', () => {
+      document.getElementById('license-validation-section').style.display = "block";
+      document.getElementById('user-tool-section').style.display = "none";
+      document.getElementById('admin-section').style.display = "none";
+    });
+    document.getElementById('nav-admin').addEventListener('click', () => {
+      document.getElementById('license-validation-section').style.display = "none";
+      document.getElementById('user-tool-section').style.display = "none";
+      document.getElementById('admin-section').style.display = "block";
+    });
+  </script>
+
+  <!-- Visitor Counter Script (Demo Only) -->
+  <script>
+    function updateVisitorCounters() {
+      let totalVisitors = localStorage.getItem('totalVisitors');
+      let todayVisitors = localStorage.getItem('todayVisitors');
+      let visitorDate = localStorage.getItem('visitorDate');
+      const today = new Date().toISOString().slice(0,10);
+      if (!totalVisitors) totalVisitors = 0;
+      if (!todayVisitors) todayVisitors = 0;
+      if (visitorDate !== today) {
+        todayVisitors = 0;
+        visitorDate = today;
+      }
+      totalVisitors = parseInt(totalVisitors) + 1;
+      todayVisitors = parseInt(todayVisitors) + 1;
+      localStorage.setItem('totalVisitors', totalVisitors);
+      localStorage.setItem('todayVisitors', todayVisitors);
+      localStorage.setItem('visitorDate', visitorDate);
+      document.getElementById('total-visitors').textContent = totalVisitors;
+      document.getElementById('today-visitors').textContent = todayVisitors;
+    }
+    window.addEventListener('load', updateVisitorCounters);
+  </script>
+</body>
+</html>
